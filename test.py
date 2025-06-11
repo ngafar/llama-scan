@@ -1,3 +1,3 @@
-from src.transcriber import generate_image_description
+from src.transcriber import transcribe_image
 
-print(generate_image_description("check-example.jpg"))
+print(transcribe_image("check-example.jpg"))

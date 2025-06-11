@@ -5,7 +5,7 @@ DEFAULT_MODEL = "qwen2.5vl:latest"
 OLLAMA_BASE_URL = "http://localhost:11434/api"
 
 
-def generate_image_description(image_path, model=DEFAULT_MODEL):
+def transcribe_image(image_path, model=DEFAULT_MODEL):
     # Read and encode the image
     with open(image_path, "rb") as image_file:
         image_data = base64.b64encode(image_file.read()).decode("utf-8")
