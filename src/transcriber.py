@@ -13,7 +13,7 @@ def transcribe_image(image_path, model=DEFAULT_MODEL):
     # Prepare the request payload
     payload = {
         "model": model,
-        "prompt": "How much is this check for?",
+        "prompt": "The image provided is a page from a book. Please transcribe the text in the image exactly as it is written. Do not add any additional text or formatting. You may use markdown formatting for lists, bold, italics, etc. If there is an image on the page, please describe it. The image description should be placed in an <image> tag. Do not include the ```markdown or ``` tags in your response.",
         "stream": False,
         "images": [image_data],
     }
