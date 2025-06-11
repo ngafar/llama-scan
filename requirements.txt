@@ -1,6 +1,7 @@
 certifi==2025.4.26
 charset-normalizer==3.4.2
 idna==3.10
+pillow==11.2.1
 PyMuPDF==1.26.0
 requests==2.32.4
 urllib3==2.4.0
