@@ -7,9 +7,15 @@ def main():
     parser = argparse.ArgumentParser(
         description="Convert PDF pages to images and transcribe them using Ollama."
     )
-    parser.add_argument("pdf_path", help="Path to the input PDF file")
     parser.add_argument(
-        "--output", "-o", default="output", help="Output directory (default: output)"
+        "pdf_path",
+        help="Path to the input PDF file",
+    )
+    parser.add_argument(
+        "--output",
+        "-o",
+        default="output",
+        help="Output directory (default: output)",
     )
     parser.add_argument(
         "--model",
