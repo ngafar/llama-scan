@@ -38,23 +38,19 @@ def process_pdf(
     try:
         # Convert PDF to images
         print(f"Converting PDF to images...")
-        pdf_to_images(str(pdf_path))
+        pdf_to_images(str(pdf_path), image_dir)
 
         # Process each page
-        image_files = sorted(Path().glob("page_*.png"))
+        image_files = sorted(image_dir.glob("page_*.png"))
         total_pages = len(image_files)
 
         print(f"\nProcessing {total_pages} pages...")
         for i, image_file in enumerate(image_files, 1):
             print(f"\nProcessing page {i}/{total_pages}")
 
-            # Move image to output directory
-            new_image_path = image_dir / image_file.name
-            image_file.rename(new_image_path)
-
             # Transcribe the image
             try:
-                text = transcribe_image(str(new_image_path), model=model)
+                text = transcribe_image(str(image_file), model=model)
 
                 # Save transcription
                 text_file = text_dir / f"{image_file.stem}.txt"
@@ -68,7 +64,7 @@ def process_pdf(
 
             # Clean up image if not keeping them
             if not keep_images:
-                new_image_path.unlink()
+                image_file.unlink()
 
         print(f"\nProcessing complete! Output saved to: {output_base}")
 
