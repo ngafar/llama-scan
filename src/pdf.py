@@ -30,8 +30,11 @@ def resize_image(image_path: str, output_path: str, width: int) -> None:
         output_path (str): Path where the resized image will be saved
         width (int): Desired width of the image
     """
-    img = Image.open(image_path)
-    w_percent = width / float(img.size[0])
-    h_size = int((float(img.size[1]) * float(w_percent)))
-    img = img.resize((width, h_size), Image.Resampling.LANCZOS)
-    img.save(output_path)
+    if width == 0:
+        return
+    else:
+        img = Image.open(image_path)
+        w_percent = width / float(img.size[0])
+        h_size = int((float(img.size[1]) * float(w_percent)))
+        img = img.resize((width, h_size), Image.Resampling.LANCZOS)
+        img.save(output_path)

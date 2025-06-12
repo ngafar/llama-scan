@@ -34,7 +34,7 @@ def main():
         "-w",
         type=int,
         default=500,
-        help="Width of the resized images (default: 500)",
+        help="Width of the resized images (default: 500). Set to 0 to skip resizing.",
     )
 
     args = parser.parse_args()
