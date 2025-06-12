@@ -36,6 +36,13 @@ def main():
         default=500,
         help="Width of the resized images (default: 500). Set to 0 to skip resizing.",
     )
+    parser.add_argument(
+        "--page",
+        "-p",
+        type=int,
+        default=0,
+        help="Page number to convert (default: 0). Set to 0 to convert all pages.",
+    )
 
     args = parser.parse_args()
 
@@ -45,6 +52,7 @@ def main():
         model=args.model,
         keep_images=args.keep_images,
         width=args.width,
+        page=args.page,
     )
 
 

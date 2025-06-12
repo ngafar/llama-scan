@@ -12,6 +12,7 @@ def process_pdf(
     model: str = "qwen2.5vl:latest",
     keep_images: bool = False,
     width: int = 500,
+    page: int = 0,
 ) -> None:
     """
     Process a PDF file, converting pages to images and transcribing them.
@@ -22,6 +23,7 @@ def process_pdf(
         model (str): The model to use for transcription.
         keep_images (bool): Whether to keep the images after processing.
         width (int): The width of the resized images.
+        page (int): The page number to convert.
     """
     pdf_path = Path(pdf_path)
     output_base = Path(output_dir)
@@ -36,7 +38,7 @@ def process_pdf(
     try:
         # Convert PDF to images
         print(f"Converting PDF to images...")
-        pdf_to_images(str(pdf_path), image_dir)
+        pdf_to_images(str(pdf_path), image_dir, page)
 
         # Process each page
         image_files = sorted(image_dir.glob("page_*.png"))
