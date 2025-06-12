@@ -12,7 +12,15 @@ def process_pdf(
     model: str = "qwen2.5vl:latest",
     keep_images: bool = False,
 ) -> None:
-    """Process a PDF file, converting pages to images and transcribing them."""
+    """
+    Process a PDF file, converting pages to images and transcribing them.
+
+    Args:
+        pdf_path (str): The path to the PDF file.
+        output_dir (str): The directory to save the output.
+        model (str): The model to use for transcription.
+        keep_images (bool): Whether to keep the images after processing.
+    """
     pdf_path = Path(pdf_path)
     output_base = Path(output_dir)
 

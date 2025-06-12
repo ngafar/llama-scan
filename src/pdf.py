@@ -9,8 +9,8 @@ def pdf_to_images(pdf_path: str, output_dir: Path) -> None:
     Convert PDF pages to images and save them to the specified output directory.
 
     Args:
-        pdf_path: Path to the input PDF file
-        output_dir: Directory where the images will be saved
+        pdf_path (str): Path to the input PDF file
+        output_dir (Path): Directory where the images will be saved
     """
     doc = pymupdf.open(pdf_path)
 

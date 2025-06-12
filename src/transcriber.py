@@ -4,7 +4,14 @@ import requests
 from src.constants import OLLAMA_BASE_URL, TRANSCRIPTION_PROMPT
 
 
-def transcribe_image(image_path, model):
+def transcribe_image(image_path: str, model: str) -> str:
+    """
+    Transcribe an image using the specified model.
+
+    Args:
+        image_path (str): Path to the image file.
+        model (str): The model to use for transcription.
+    """
     # Read and encode the image
     with open(image_path, "rb") as image_file:
         image_data = base64.b64encode(image_file.read()).decode("utf-8")
