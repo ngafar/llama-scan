@@ -17,7 +17,7 @@ def pdf_to_images(pdf_path: str, output_dir: Path) -> None:
     for page in doc:
         pix = page.get_pixmap()
         img = Image.open(io.BytesIO(pix.tobytes("png")))
-        output_path = output_dir / f"page_{page.number}.png"
+        output_path = output_dir / f"page_{page.number + 1}.png"
         img.save(str(output_path))
 
 
