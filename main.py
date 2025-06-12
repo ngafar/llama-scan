@@ -33,8 +33,8 @@ def main():
         "--width",
         "-w",
         type=int,
-        default=500,
-        help="Width of the resized images (default: 500). Set to 0 to skip resizing.",
+        default=0,
+        help="Width of the resized images. Set to 0 to skip resizing.",
     )
     parser.add_argument(
         "--page",
