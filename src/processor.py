@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from src.pdf import pdf_to_images
+from src.pdf import pdf_to_images, resize_image
 from src.transcriber import transcribe_image
 from src.utils import setup_output_dirs
 
@@ -11,6 +11,7 @@ def process_pdf(
     output_dir: str,
     model: str = "qwen2.5vl:latest",
     keep_images: bool = False,
+    width: int = 500,
 ) -> None:
     """
     Process a PDF file, converting pages to images and transcribing them.
@@ -20,6 +21,7 @@ def process_pdf(
         output_dir (str): The directory to save the output.
         model (str): The model to use for transcription.
         keep_images (bool): Whether to keep the images after processing.
+        width (int): The width of the resized images.
     """
     pdf_path = Path(pdf_path)
     output_base = Path(output_dir)
@@ -39,6 +41,10 @@ def process_pdf(
         # Process each page
         image_files = sorted(image_dir.glob("page_*.png"))
         total_pages = len(image_files)
+
+        # Resize images to 500px width
+        for image_file in image_files:
+            resize_image(str(image_file), str(image_file), width)
 
         print(f"\nProcessing {total_pages} pages...")
         for i, image_file in enumerate(image_files, 1):
@@ -66,4 +72,4 @@ def process_pdf(
 
     except Exception as e:
         print(f"Error: {str(e)}")
-        sys.exit(1) 
+        sys.exit(1)

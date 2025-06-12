@@ -29,6 +29,13 @@ def main():
         action="store_true",
         help="Keep the intermediate image files",
     )
+    parser.add_argument(
+        "--width",
+        "-w",
+        type=int,
+        default=500,
+        help="Width of the resized images (default: 500)",
+    )
 
     args = parser.parse_args()
 
@@ -37,6 +44,7 @@ def main():
         output_dir=args.output,
         model=args.model,
         keep_images=args.keep_images,
+        width=args.width,
     )
 
 
