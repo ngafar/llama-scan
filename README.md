@@ -1,11 +1,11 @@
 # Study Buddy
 
-A tool that converts PDF pages to images and transcribes them using Ollama's vision models.
+A tool for converting PDFs to text files using Ollama.
 
 ## Features
 
 - Convert PDF pages to images
-- Transcribe images using Ollama's vision models
+- Transcribe images using multimodal models via Ollama
 - Support for page range selection
 - Optional image resizing
 - Configurable output directory
