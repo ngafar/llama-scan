@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from tqdm import tqdm
 
 from src.pdf import pdf_to_images, resize_image
 from src.transcriber import transcribe_image
@@ -39,7 +40,6 @@ def process_pdf(
 
     try:
         # Convert PDF to images
-        print(f"Converting PDF to images...")
         pdf_to_images(str(pdf_path), image_dir, start, end)
 
         # Process each page
@@ -47,13 +47,17 @@ def process_pdf(
         total_pages = len(image_files)
 
         # Resize images to 500px width
-        for image_file in image_files:
-            resize_image(str(image_file), str(image_file), width)
+        if width > 0:
+            for image_file in tqdm(image_files, desc="Resizing images"):
+                resize_image(str(image_file), str(image_file), width)
+        else:
+            pass  # Skip resizing
 
-        print(f"\nProcessing {total_pages} pages...")
-        for i, image_file in enumerate(image_files, 1):
-            print(f"\nProcessing page {i}/{total_pages}")
-
+        for i, image_file in tqdm(
+            enumerate(image_files, 1),
+            desc="Transcribing pages",
+            total=total_pages,
+        ):
             # Transcribe the image
             try:
                 text = transcribe_image(str(image_file), model=model)
@@ -62,17 +66,14 @@ def process_pdf(
                 text_file = text_dir / f"{image_file.stem}.txt"
                 with open(text_file, "w") as f:
                     f.write(text)
-
-                print(f"✓ Page {i} transcribed successfully")
-
             except Exception as e:
-                print(f"✗ Error processing page {i}: {str(e)}")
+                print(f"Error processing page {i}: {str(e)}")
 
             # Clean up image if not keeping them
             if not keep_images:
                 image_file.unlink()
 
-        print(f"\nProcessing complete! Output saved to: {output_base}")
+        print(f"Processing complete! Output saved to: {output_base}")
 
     except Exception as e:
         print(f"Error: {str(e)}")

@@ -2,6 +2,7 @@ import io
 import pymupdf
 from PIL import Image
 from pathlib import Path
+from tqdm import tqdm
 
 
 def pdf_to_images(
@@ -34,7 +35,11 @@ def pdf_to_images(
     end = total_pages if end == 0 else end
 
     # Convert specified pages
-    for page_num in range(start, end + 1):
+    for page_num in tqdm(
+        range(start, end + 1),
+        desc="Converting pages to images",
+        total=end - start + 1,
+    ):
         page = doc[page_num - 1]  # Convert to 0-based index
         pix = page.get_pixmap()
         img = Image.open(io.BytesIO(pix.tobytes("png")))
