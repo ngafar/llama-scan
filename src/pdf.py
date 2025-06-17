@@ -4,35 +4,41 @@ from PIL import Image
 from pathlib import Path
 
 
-def pdf_to_images(pdf_path: str, output_dir: Path, page: int = 0) -> None:
+def pdf_to_images(
+    pdf_path: str, output_dir: Path, start: int = 0, end: int = 0
+) -> None:
     """
     Convert PDF pages to images and save them to the specified output directory.
 
     Args:
         pdf_path (str): Path to the input PDF file
         output_dir (Path): Directory where the images will be saved
-        page (int): The page number to convert. If 0, converts all pages.
+        start (int): The start page number (1-based). If 0, starts from first page.
+        end (int): The end page number (1-based). If 0, goes until last page.
     """
     doc = pymupdf.open(pdf_path)
+    total_pages = len(doc)
 
-    if page == 0:
-        # Convert all pages
-        for page in doc:
-            pix = page.get_pixmap()
-            img = Image.open(io.BytesIO(pix.tobytes("png")))
-            output_path = output_dir / f"page_{page.number + 1}.png"
-            img.save(str(output_path))
-    else:
-        # Convert single specified page
-        if page > len(doc) or page < 1:
-            raise ValueError(
-                f"Page number {page} is out of range. Document has {len(doc)} pages."
-            )
+    # Validate page numbers
+    if start < 0 or (start > total_pages and start != 0):
+        raise ValueError(
+            f"Start page number {start} is out of range. Document has {total_pages} pages."
+        )
+    if end < 0 or (end > total_pages and end != 0):
+        raise ValueError(
+            f"End page number {end} is out of range. Document has {total_pages} pages."
+        )
 
-        page = doc[page - 1]  # Convert to 0-based index
+    # Set default values for start and end
+    start = 1 if start == 0 else start
+    end = total_pages if end == 0 else end
+
+    # Convert specified pages
+    for page_num in range(start, end + 1):
+        page = doc[page_num - 1]  # Convert to 0-based index
         pix = page.get_pixmap()
         img = Image.open(io.BytesIO(pix.tobytes("png")))
-        output_path = output_dir / f"page_{page.number + 1}.png"
+        output_path = output_dir / f"page_{page_num}.png"
         img.save(str(output_path))
 
 

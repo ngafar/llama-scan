@@ -37,11 +37,18 @@ def main():
         help="Width of the resized images. Set to 0 to skip resizing.",
     )
     parser.add_argument(
-        "--page",
-        "-p",
+        "--start",
+        "-s",
         type=int,
         default=0,
-        help="Page number to convert (default: 0). Set to 0 to convert all pages.",
+        help="Start page number (default: 0).",
+    )
+    parser.add_argument(
+        "--end",
+        "-e",
+        type=int,
+        default=0,
+        help="End page number (default: 0).",
     )
 
     args = parser.parse_args()
@@ -52,7 +59,8 @@ def main():
         model=args.model,
         keep_images=args.keep_images,
         width=args.width,
-        page=args.page,
+        start=args.start,
+        end=args.end,
     )
 
 
