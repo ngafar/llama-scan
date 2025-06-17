@@ -6,6 +6,7 @@ A tool for converting PDFs to text files using Ollama.
 
 - Convert PDFs to text files locally, no token costs.
 - Use the latest multimodal models supported by Ollama.
+- Turn images and diagrams into detailed text descriptions.
 - Optional settings to optimize performance.
 
 ## Requirements
@@ -40,8 +41,8 @@ python main.py path/to/your/file.pdf
 
 - `--output`, `-o`: Output directory (default: "output")
 - `--model`, `-m`: Ollama model to use (default: "qwen2.5vl:latest")
-- `--keep-images`, `-k`: Keep the intermediate image files
-- `--width`, `-w`: Width of the resized images (0 to skip resizing)
+- `--keep-images`, `-k`: Keep the intermediate image files (default: False)
+- `--width`, `-w`: Width of the resized images (0 to skip resizing; default: 0)
 - `--start`, `-s`: Start page number (default: 0)
 - `--end`, `-e`: End page number (default: 0)
 
