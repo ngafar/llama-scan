@@ -1,14 +1,12 @@
-# Study Buddy
+# llama-scan
 
 A tool for converting PDFs to text files using Ollama.
 
 ## Features
 
-- Convert PDF pages to images
-- Transcribe images using multimodal models via Ollama
-- Support for page range selection
-- Optional image resizing
-- Configurable output directory
+- Convert PDFs to text files locally, no token costs.
+- Use the latest multimodal models supported by Ollama.
+- Optional settings to optimize performance.
 
 ## Requirements
 
