@@ -11,7 +11,7 @@ A tool for converting PDFs to text files using Ollama.
 
 ## Requirements
 
-- Python 3.x
+- Python 3.10+
 - Ollama installed and running locally
 
 ### Installing Ollama and the Default Model
