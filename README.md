@@ -24,17 +24,21 @@ ollama run qwen2.5vl:latest
 
 ## Installation
 
-1. Clone this repository
-2. Install the required dependencies:
+Install using pip:
 ```bash
-pip install -r requirements.txt
+pip install llama-scan
+```
+
+or uv:
+```bash
+uv tool install llama-scan
 ```
 
 ## Usage
 
 Basic usage:
 ```bash
-python main.py path/to/your/file.pdf
+llama-scan path/to/your/file.pdf
 ```
 
 ### Options
@@ -50,10 +54,10 @@ python main.py path/to/your/file.pdf
 
 Process specific pages with custom width:
 ```bash
-python main.py document.pdf --start 1 --end 5 --width 1000
+llama-scan document.pdf --start 1 --end 5 --width 1000
 ```
 
 Use a different Ollama model:
 ```bash
-python main.py document.pdf --model qwen2.5vl:3b
+llama-scan document.pdf --model qwen2.5vl:3b
 ```
