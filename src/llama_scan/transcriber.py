@@ -1,7 +1,7 @@
 import base64
 import requests
 
-from src.constants import OLLAMA_BASE_URL, TRANSCRIPTION_PROMPT
+from .constants import OLLAMA_BASE_URL, TRANSCRIPTION_PROMPT
 
 
 def transcribe_image(image_path: str, model: str) -> str:

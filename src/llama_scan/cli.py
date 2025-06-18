@@ -1,9 +1,9 @@
 import argparse
 
-from src.processor import process_pdf
+from .processor import process_pdf
 
 
-def main():
+def cli():
     parser = argparse.ArgumentParser(
         description="Convert PDF pages to images and transcribe them using Ollama."
     )
@@ -65,4 +65,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    cli()

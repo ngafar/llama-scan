@@ -10,3 +10,10 @@ dependencies = [
     "requests>=2.32.4",
     "tqdm>=4.67.1",
 ]
+
+[project.scripts]
+llama-scan = "llama_scan.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
