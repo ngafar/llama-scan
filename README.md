@@ -49,6 +49,7 @@ llama-scan path/to/your/file.pdf
 - `--width`, `-w`: Width of the resized images (0 to skip resizing; default: 0)
 - `--start`, `-s`: Start page number (default: 0)
 - `--end`, `-e`: End page number (default: 0)
+- `--merge-text`, `-mt`: Merge all individual text files into a single merged file (default: False)
 
 ### Examples
 
