@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 from .pdf import pdf_to_images, resize_image
 from .transcriber import transcribe_image
-from .utils import setup_output_dirs
+from .utils import setup_output_dirs, merge_text_files
 
 
 def process_pdf(
@@ -15,6 +15,7 @@ def process_pdf(
     width: int = 500,
     start: int = 0,
     end: int = 0,
+    merge_text: bool = False,
 ) -> None:
     """
     Process a PDF file, converting pages to images and transcribing them.
@@ -27,6 +28,7 @@ def process_pdf(
         width (int): The width of the resized images.
         start (int): The start page number.
         end (int): The end page number.
+        merge_text (bool): Whether to merge all text files into a single file.
     """
     pdf_path = Path(pdf_path)
     output_base = Path(output_dir)
@@ -64,7 +66,7 @@ def process_pdf(
 
                 # Save transcription
                 text_file = text_dir / f"{image_file.stem}.txt"
-                with open(text_file, "w") as f:
+                with open(text_file, "w", encoding="utf-8") as f:
                     f.write(text)
             except Exception as e:
                 print(f"Error processing page {i}: {str(e)}")
@@ -72,6 +74,11 @@ def process_pdf(
             # Clean up image if not keeping them
             if not keep_images:
                 image_file.unlink()
+
+        # Merge text files if requested
+        if merge_text:
+            merged_file = merge_text_files(text_dir)
+            print(f"Merged text file created: {merged_file}")
 
         print(f"Processing complete! Output saved to: {output_base}")
 

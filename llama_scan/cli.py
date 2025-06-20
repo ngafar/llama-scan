@@ -50,6 +50,12 @@ def cli():
         default=0,
         help="End page number (default: 0).",
     )
+    parser.add_argument(
+        "--merge-text",
+        "-mt",
+        action="store_true",
+        help="Merge all individual text files into a single merged file",
+    )
 
     args = parser.parse_args()
 
@@ -61,6 +67,7 @@ def cli():
         width=args.width,
         start=args.start,
         end=args.end,
+        merge_text=args.merge_text,
     )
 
 
