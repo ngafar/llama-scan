@@ -14,6 +14,10 @@ dependencies = [
 [project.scripts]
 llama-scan = "llama_scan.cli:cli"
 
+[project.urls]
+Homepage = "https://github.com/ngafar/llama-scan"
+Issues = "https://github.com/ngafar/llama-scan/issues"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
