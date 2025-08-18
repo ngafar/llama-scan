@@ -1,4 +1,6 @@
-OLLAMA_BASE_URL = "http://localhost:11434/api"
+import os
+
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/api")
 
 TRANSCRIPTION_PROMPT = """Task: Transcribe the page from the provided book image.
 

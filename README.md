@@ -11,7 +11,7 @@ A tool for converting PDFs to text files using Ollama.
 ## Requirements
 
 - Python 3.10+
-- Ollama installed and running locally
+- Ollama installed and running locally or running in the OLLAMA_BASE_URL environment variable (OLLAMA_BASE_URL=http://localhost:11434/api)
 
 ### Installing Ollama and the Default Model
 
