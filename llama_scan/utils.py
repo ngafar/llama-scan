@@ -1,4 +1,5 @@
 import io
+import sys
 import pymupdf
 from pathlib import Path
 from PIL import Image
@@ -96,12 +97,15 @@ def merge_text_files(text_dir: Path) -> Path:
     text_files = sorted(text_dir.glob("page_*.txt"))
     merged_file = text_dir / "merged.txt"
 
-    if text_files:
-        with open(merged_file, "w", encoding="utf-8") as merged_f:
-            for text_file in text_files:
-                with open(text_file, "r", encoding="utf-8", errors="replace") as f:
-                    content = f.read().strip()
-                    if content:  # Only add non-empty content
-                        merged_f.write(content + "\n\n")
+    if not text_files:
+        print("No text files found")
+        return 
+
+    with open(merged_file, "w", encoding="utf-8") as merged_f:
+        for text_file in text_files:
+            with open(text_file, "r", encoding="utf-8", errors="replace") as f:
+                content = f.read().strip()
+                if content:  # Only add non-empty content
+                    merged_f.write(content + "\n\n")
 
     return merged_file
