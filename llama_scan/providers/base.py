@@ -1,4 +1,4 @@
-from ..constants import BASE_TRANSCRIPTION_PROMPT
+from ..prompts import BASE_TRANSCRIPTION_PROMPT
 
 
 class TranscriptionProvider:
