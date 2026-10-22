@@ -59,12 +59,12 @@ The following options can be used to customize PDF processing.
 
 **Model configuration**
 
-| Option | Description | Default |
-|---|---|---|
-| `--provider`, `-p` | Transcription provider (`ollama` or `openrouter`) | `ollama` |
-| `--model`, `-m` | Model used for transcription | `qwen2.5vl:latest` (Ollama) |
-| `--server-url`, `-u` | Ollama server URL | `http://localhost:11434` |
-| `--prompt` | Path to a text file that replaces the default transcription prompt | Default book prompt |
+| Option               | Description                                                        | Default                     |
+| -------------------- | ------------------------------------------------------------------ | --------------------------- |
+| `--provider`, `-p`   | Transcription provider (`ollama` or `openrouter`)                  | `ollama`                    |
+| `--model`, `-m`      | Model used for transcription                                       | `qwen2.5vl:latest` (Ollama) |
+| `--server-url`, `-u` | Ollama server URL                                                  | `http://localhost:11434`    |
+| `--prompt`           | Path to a text file that replaces the default transcription prompt |                             |
 
 **Image processing**
 
@@ -87,16 +87,9 @@ Use a different Ollama model:
 llama-scan document.pdf --model qwen2.5vl:3b
 ```
 
-Replace the default prompt:
-
-```bash
-llama-scan document.pdf --prompt prompt.txt
-```
-
 ## Python API
 
 In addition to the command-line interface (CLI), llama-scan can be used directly in Python scripts. This allows you to integrate PDF processing into your own applications and workflows.
-
 
 ```python
 from llama_scan import process_pdf
