@@ -77,11 +77,9 @@ def process_pdf(
 
     image_dir, text_dir = setup_output_dirs(output_base)
 
-    pdf_to_images(
+    image_files = pdf_to_images(
         str(pdf_path), image_dir, start, end, show_progress=show_progress, dpi=dpi
     )
-
-    image_files = sorted(image_dir.glob("page_*.png"))
     total_pages = len(image_files)
 
     if width > 0:

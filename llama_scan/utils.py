@@ -10,8 +10,8 @@ def setup_output_dirs(output_base: Path) -> tuple[Path, Path]:
     """
     Create and return paths for image and text output directories.
 
-    Previous `page_*.txt` files and `merged.txt` in the text directory are removed
-    so a reused output directory does not include transcriptions from an earlier run.
+    Previous page images, `page_*.txt` files, and `merged.txt` in this directory are
+    removed so a reused output directory does not include files from an earlier run.
 
     Args:
         output_base (Path): The base directory for output.
@@ -21,13 +21,15 @@ def setup_output_dirs(output_base: Path) -> tuple[Path, Path]:
 
     image_dir.mkdir(parents=True, exist_ok=True)
     text_dir.mkdir(parents=True, exist_ok=True)
-    clear_text_outputs(text_dir)
+    clear_previous_outputs(image_dir, text_dir)
 
     return image_dir, text_dir
 
 
-def clear_text_outputs(text_dir: Path) -> None:
-    """Remove transcription files left by a previous run in this directory."""
+def clear_previous_outputs(image_dir: Path, text_dir: Path) -> None:
+    """Remove page images and transcription files left by a previous run."""
+    for path in image_dir.glob("page_*.png"):
+        path.unlink()
     for path in text_dir.glob("page_*.txt"):
         path.unlink()
     merged_file = text_dir / "merged.txt"
@@ -42,7 +44,7 @@ def pdf_to_images(
     end: int = 0,
     show_progress: bool = True,
     dpi: int = 72,
-) -> None:
+) -> list[Path]:
     """
     Convert PDF pages to images and save them to the specified output directory.
 
@@ -53,6 +55,9 @@ def pdf_to_images(
         end (int): The end page number (1-based). If 0, goes until last page.
         show_progress (bool): Whether to display a progress bar.
         dpi (int): Resolution used when rendering each page.
+
+    Returns:
+        Paths of the page images written for this run, in page order.
     """
     if dpi <= 0:
         raise ValueError(f"DPI must be positive, got {dpi}.")
@@ -75,6 +80,7 @@ def pdf_to_images(
     end = total_pages if end == 0 else end
 
     # Convert specified pages
+    written_images: list[Path] = []
     for page_num in tqdm(
         range(start, end + 1),
         desc="Converting pages to images",
@@ -87,6 +93,9 @@ def pdf_to_images(
         n_digits = len(str(total_pages))
         output_path = output_dir / f"page_{page_num:0{n_digits}d}.png"
         img.save(str(output_path))
+        written_images.append(output_path)
+
+    return written_images
 
 
 def resize_image(image_path: str, output_path: str, width: int) -> None:
