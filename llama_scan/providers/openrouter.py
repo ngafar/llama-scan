@@ -91,7 +91,9 @@ class OpenRouterProvider(TranscriptionProvider):
         }
 
         try:
-            response = requests.post(API_URL, headers=headers, json=payload, timeout=300)
+            response = requests.post(
+                API_URL, headers=headers, json=payload, timeout=300
+            )
         except requests.exceptions.RequestException as exc:
             raise ProviderError(f"OpenRouter request failed: {exc}") from exc
 
