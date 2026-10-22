@@ -1,4 +1,4 @@
-from ..constants import BASE_TRANSCRIPTION_PROMPT
+from ..prompts import BASE_TRANSCRIPTION_PROMPT
 
 
 class TranscriptionProvider:
@@ -15,15 +15,14 @@ class TranscriptionProvider:
         self,
         image_path: str,
         model: str,
-        custom_instructions: str | None = None,
+        prompt: str | None = None,
     ) -> str:
         """Transcribe one page image and return the text."""
         raise NotImplementedError
 
 
-def build_prompt(custom_instructions: str | None) -> str:
-    """Build the transcription prompt, appending any custom instructions."""
-    prompt = BASE_TRANSCRIPTION_PROMPT
-    if custom_instructions:
-        prompt = prompt + f"\n\n{custom_instructions}"
-    return prompt
+def build_prompt(prompt: str | None = None) -> str:
+    """Return `prompt` when set, otherwise the default transcription prompt."""
+    if prompt is not None and prompt.strip():
+        return prompt.strip()
+    return BASE_TRANSCRIPTION_PROMPT

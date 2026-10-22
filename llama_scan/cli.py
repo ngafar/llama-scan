@@ -1,8 +1,11 @@
 import argparse
+import sys
 from datetime import datetime
+from pathlib import Path
 
-from .processor import process_pdf
-from .providers import PROVIDERS, get_provider
+from .errors import LlamaScanError
+from .providers import PROVIDERS
+from .transcribe import process_pdf
 
 
 def cli():
@@ -50,9 +53,8 @@ def cli():
         help="End page number (default: 0)",
     )
     parser.add_argument(
-        "--custom-instructions",
-        "-c",
-        help="Path to a text file containing additional instructions for the transcription prompt",
+        "--prompt",
+        help="Path to a text file that replaces the default transcription prompt",
     )
     parser.add_argument(
         "--server-url",
@@ -68,6 +70,12 @@ def cli():
         help="Width of the resized images. Set to 0 to skip resizing (default: 0)",
     )
     parser.add_argument(
+        "--dpi",
+        type=int,
+        default=72,
+        help="Resolution used when rendering PDF pages (default: 72)",
+    )
+    parser.add_argument(
         "--keep-images",
         "-k",
         action="store_true",
@@ -77,20 +85,37 @@ def cli():
 
     args = parser.parse_args()
 
-    provider = get_provider(args.provider, server_url=args.server_url)
-    model = args.model or provider.default_model
+    try:
+        process_pdf(
+            pdf_path=args.pdf_path,
+            output_dir=args.output,
+            provider=args.provider,
+            model=args.model,
+            prompt=_read_prompt(args.prompt),
+            keep_images=args.keep_images,
+            width=args.width,
+            dpi=args.dpi,
+            start=args.start,
+            end=args.end,
+            server_url=args.server_url,
+        )
+    except (LlamaScanError, OSError, ValueError, RuntimeError) as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
 
-    process_pdf(
-        pdf_path=args.pdf_path,
-        custom_instructions=args.custom_instructions,
-        output_dir=args.output,
-        model=model,
-        keep_images=args.keep_images,
-        width=args.width,
-        start=args.start,
-        end=args.end,
-        provider=provider,
-    )
+
+def _read_prompt(path: str | None) -> str | None:
+    """Read a prompt file. Returns None when no path was given."""
+    if not path:
+        return None
+
+    prompt_path = Path(path)
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {prompt_path}")
+    try:
+        return prompt_path.read_text(encoding="utf-8").strip()
+    except OSError as e:
+        raise OSError(f"Error reading prompt file: {e}") from e
 
 
 if __name__ == "__main__":

@@ -47,17 +47,32 @@ llama-scan path/to/your/file.pdf
 
 ### Options
 
-| Option                        | Description                                                     | Default                     |
-| ----------------------------- | --------------------------------------------------------------- | --------------------------- |
-| `--provider`, `-p`            | Transcription provider, `ollama` or `openrouter`                | `ollama`                    |
-| `--output`, `-o`              | Output directory                                                | `output/`                   |
-| `--model`, `-m`               | Model to use                                                    | `qwen2.5vl:latest` (Ollama) |
-| `--start`, `-s`               | Start page number                                               | 0                         |
-| `--end`, `-e`                 | End page number                                                 | 0                         |
-| `--custom-instructions`, `-c` | Optional path to a text file containing additional instructions | None                        |
-| `--server-url`, `-u`          | Ollama server URL                                               | `http://localhost:11434`    |
-| `--width`, `-w`               | Width of the resized images (0 to skip resizing)                | 0                         |
-| `--keep-images`, `-k`         | Keep the intermediate image files                               | `False`                     |
+The following options can be used to customize PDF processing.
+
+**General**
+
+| Option | Description | Default |
+|---|---|---|
+| `--output`, `-o` | Directory where results are saved | `output/` |
+| `--start`, `-s` | First page to process | `0` |
+| `--end`, `-e` | Last page to process | `0` |
+
+**Model configuration**
+
+| Option               | Description                                                        | Default                     |
+| -------------------- | ------------------------------------------------------------------ | --------------------------- |
+| `--provider`, `-p`   | Transcription provider (`ollama` or `openrouter`)                  | `ollama`                    |
+| `--model`, `-m`      | Model used for transcription                                       | `qwen2.5vl:latest` (Ollama) |
+| `--server-url`, `-u` | Ollama server URL                                                  | `http://localhost:11434`    |
+| `--prompt`           | Path to a text file that replaces the default transcription prompt |                             |
+
+**Image processing**
+
+| Option | Description | Default |
+|---|---|---|
+| `--width`, `-w` | Resize images to the specified width (`0` disables resizing) | `0` |
+| `--dpi` | Resolution used when rendering PDF pages | `72` |
+| `--keep-images`, `-k` | Keep intermediate image files | `False` |
 
 ### Examples
 
@@ -71,4 +86,15 @@ Use a different Ollama model:
 
 ```bash
 llama-scan document.pdf --model qwen2.5vl:3b
+```
+
+## Python API
+
+In addition to the command-line interface (CLI), llama-scan can be used directly in Python scripts. This allows you to integrate PDF processing into your own applications and workflows.
+
+```python
+from llama_scan import process_pdf
+
+merged = process_pdf("document.pdf", "output")
+print(merged.read_text(encoding="utf-8"))
 ```
