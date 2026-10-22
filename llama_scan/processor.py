@@ -11,9 +11,7 @@ class PageTranscriptionError(Exception):
 
     def __init__(self, failures: list[tuple[int, str]]):
         self.failures = failures
-        detail = ", ".join(
-            f"page {number} ({message})" for number, message in failures
-        )
+        detail = ", ".join(f"page {number} ({message})" for number, message in failures)
         noun = "page" if len(failures) == 1 else "pages"
         super().__init__(f"Failed to transcribe {len(failures)} {noun}: {detail}")
 
