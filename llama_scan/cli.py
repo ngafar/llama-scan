@@ -74,12 +74,6 @@ def cli():
         default=False,
         help="Keep the intermediate image files (default: False)",
     )
-    parser.add_argument(
-        "--stdout",
-        action="store_true",
-        default=False,
-        help="Write merged output to stdout (default: False)",
-    )
 
     args = parser.parse_args()
 
@@ -95,7 +89,6 @@ def cli():
         width=args.width,
         start=args.start,
         end=args.end,
-        stdout=args.stdout,
         provider=provider,
     )
 

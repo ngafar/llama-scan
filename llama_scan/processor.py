@@ -15,7 +15,6 @@ def process_pdf(
     width: int,
     start: int,
     end: int,
-    stdout: bool,
     provider: TranscriptionProvider,
 ) -> None:
     """
@@ -30,7 +29,6 @@ def process_pdf(
         width (int): The width of the resized images.
         start (int): The start page number.
         end (int): The end page number.
-        stdout (bool): Whether to write output to stdout.
         provider (TranscriptionProvider): The transcription backend to use.
     """
     pdf_path = Path(pdf_path)
@@ -107,10 +105,7 @@ def process_pdf(
                 image_file.unlink()
 
         # Merge text files
-        merged_file = merge_text_files(text_dir)
-
-        if stdout:
-            print(open(merged_file, "r").read(), file=sys.stdout)
+        merge_text_files(text_dir)
 
         print(f"Processing complete! Output saved to: {output_base}", file=sys.stderr)
 

@@ -58,7 +58,6 @@ llama-scan path/to/your/file.pdf
 | `--server-url`, `-u`          | Ollama server URL                                               | `http://localhost:11434`    |
 | `--width`, `-w`               | Width of the resized images (0 to skip resizing)                | 0                         |
 | `--keep-images`, `-k`         | Keep the intermediate image files                               | `False`                     |
-| `--stdout`                    | Write merged output to stdout                                   | `False`                     |
 
 ### Examples
 
