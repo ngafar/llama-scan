@@ -22,7 +22,11 @@ def setup_output_dirs(output_base: Path) -> tuple[Path, Path]:
 
 
 def pdf_to_images(
-    pdf_path: str, output_dir: Path, start: int = 0, end: int = 0
+    pdf_path: str,
+    output_dir: Path,
+    start: int = 0,
+    end: int = 0,
+    show_progress: bool = True,
 ) -> None:
     """
     Convert PDF pages to images and save them to the specified output directory.
@@ -32,6 +36,7 @@ def pdf_to_images(
         output_dir (Path): Directory where the images will be saved
         start (int): The start page number (1-based). If 0, starts from first page.
         end (int): The end page number (1-based). If 0, goes until last page.
+        show_progress (bool): Whether to display a progress bar.
     """
     doc = pymupdf.open(pdf_path)
     total_pages = len(doc)
@@ -55,6 +60,7 @@ def pdf_to_images(
         range(start, end + 1),
         desc="Converting pages to images",
         total=end - start + 1,
+        disable=not show_progress,
     ):
         page = doc[page_num - 1]  # Convert to 0-based index
         pix = page.get_pixmap()
@@ -98,8 +104,7 @@ def merge_text_files(text_dir: Path) -> Path:
     text_from_files = []
 
     if not text_files:
-        print("No text files found")
-        return
+        raise RuntimeError("No text files found")
 
     for text_file in text_files:
         content = text_file.read_text(encoding="utf-8", errors="replace").strip()

@@ -2,113 +2,97 @@ import sys
 from pathlib import Path
 from tqdm import tqdm
 
-from .providers import TranscriptionProvider
+from .providers import TranscriptionProvider, get_provider
 from .utils import setup_output_dirs, merge_text_files, pdf_to_images, resize_image
 
 
 def process_pdf(
-    pdf_path: str,
-    custom_instructions: str,
-    output_dir: str,
-    model: str,
-    keep_images: bool,
-    width: int,
-    start: int,
-    end: int,
-    provider: TranscriptionProvider,
-) -> None:
+    pdf_path: str | Path,
+    output_dir: str | Path,
+    *,
+    provider: str | TranscriptionProvider = "ollama",
+    model: str | None = None,
+    custom_instructions: str | None = None,
+    keep_images: bool = False,
+    width: int = 0,
+    start: int = 0,
+    end: int = 0,
+    server_url: str | None = None,
+    show_progress: bool = True,
+) -> Path:
     """
-    Process a PDF file, converting pages to images and transcribing them.
+    Convert a PDF to page images and transcribe them.
 
     Args:
-        pdf_path (str): The path to the PDF file.
-        custom_instructions (str): Additional instructions for the transcription prompt.
-        output_dir (str): The directory to save the output.
-        model (str): The model to use for transcription.
-        keep_images (bool): Whether to keep the images after processing.
-        width (int): The width of the resized images.
-        start (int): The start page number.
-        end (int): The end page number.
-        provider (TranscriptionProvider): The transcription backend to use.
+        pdf_path: Path to the PDF file.
+        output_dir: Directory where images and text are written.
+        provider: Provider name (`ollama` or `openrouter`) or a provider instance.
+            Defaults to Ollama.
+        model: Model to use. Defaults to the provider's model.
+        custom_instructions: Extra prompt text appended to the transcription instructions.
+        keep_images: Whether to keep the page images after processing.
+        width: Resize images to this width. `0` leaves them unchanged.
+        start: First page to process (1-based). `0` starts at the first page.
+        end: Last page to process (1-based). `0` stops at the last page.
+        server_url: Ollama server URL, used when `provider` is a name.
+        show_progress: Whether to display progress bars.
+
+    Returns:
+        Path to the merged transcription, `output_dir/text/merged.txt`.
+
+    Raises:
+        FileNotFoundError: If the PDF does not exist.
+        ValueError: If the provider name or page range is invalid.
+        RuntimeError: If the provider is unavailable or no pages were transcribed.
     """
     pdf_path = Path(pdf_path)
     output_base = Path(output_dir)
 
     if not pdf_path.exists():
-        print(f"Error: PDF file not found: {pdf_path}")
-        sys.exit(1)
+        raise FileNotFoundError(f"PDF file not found: {pdf_path}")
 
-    try:
-        provider.check()
-    except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
+    if not isinstance(provider, TranscriptionProvider):
+        provider = get_provider(provider, server_url=server_url)
+    model = model or provider.default_model
 
+    provider.check()
     print(f"Using {provider.name} ({model})", file=sys.stderr)
 
-    # Read custom instructions file if provided
-    custom_instructions_content = None
-    if custom_instructions:
-        custom_instructions_path = Path(custom_instructions)
-        if not custom_instructions_path.exists():
-            print(
-                f"Error: Custom instructions file not found: {custom_instructions_path}"
-            )
-            sys.exit(1)
-        try:
-            with open(custom_instructions_path, "r", encoding="utf-8") as f:
-                custom_instructions_content = f.read().strip()
-        except Exception as e:
-            print(f"Error reading custom instructions file: {str(e)}")
-            sys.exit(1)
-
-    # Setup output directories
     image_dir, text_dir = setup_output_dirs(output_base)
 
-    try:
-        # Convert PDF to images
-        pdf_to_images(str(pdf_path), image_dir, start, end)
+    pdf_to_images(str(pdf_path), image_dir, start, end, show_progress=show_progress)
 
-        # Process each page
-        image_files = sorted(image_dir.glob("page_*.png"))
-        total_pages = len(image_files)
+    image_files = sorted(image_dir.glob("page_*.png"))
+    total_pages = len(image_files)
 
-        # Resize images to 500px width
-        if width > 0:
-            for image_file in tqdm(image_files, desc="Resizing images"):
-                resize_image(str(image_file), str(image_file), width)
-        else:
-            pass  # Skip resizing
-
-        for i, image_file in tqdm(
-            enumerate(image_files, 1),
-            desc="Transcribing pages",
-            total=total_pages,
+    if width > 0:
+        for image_file in tqdm(
+            image_files, desc="Resizing images", disable=not show_progress
         ):
-            # Transcribe the image
-            try:
-                transcription = provider.transcribe_image(
-                    str(image_file),
-                    model=model,
-                    custom_instructions=custom_instructions_content,
-                )
+            resize_image(str(image_file), str(image_file), width)
 
-                # Save transcription
-                text_file = text_dir / f"{image_file.stem}.txt"
-                with open(text_file, "w", encoding="utf-8") as f:
-                    f.write(transcription)
-            except Exception as e:
-                print(f"Error processing page {i}: {str(e)}", file=sys.stderr)
+    for i, image_file in tqdm(
+        enumerate(image_files, 1),
+        desc="Transcribing pages",
+        total=total_pages,
+        disable=not show_progress,
+    ):
+        try:
+            transcription = provider.transcribe_image(
+                str(image_file),
+                model=model,
+                custom_instructions=custom_instructions,
+            )
 
-            # Clean up image if not keeping them
-            if not keep_images:
-                image_file.unlink()
+            text_file = text_dir / f"{image_file.stem}.txt"
+            with open(text_file, "w", encoding="utf-8") as f:
+                f.write(transcription)
+        except Exception as e:
+            print(f"Error processing page {i}: {str(e)}", file=sys.stderr)
 
-        # Merge text files
-        merge_text_files(text_dir)
+        if not keep_images:
+            image_file.unlink()
 
-        print(f"Processing complete! Output saved to: {output_base}", file=sys.stderr)
-
-    except Exception as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
-        sys.exit(1)
+    merged_file = merge_text_files(text_dir)
+    print(f"Processing complete! Output saved to: {output_base}", file=sys.stderr)
+    return merged_file

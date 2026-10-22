@@ -1,8 +1,10 @@
 import argparse
+import sys
 from datetime import datetime
+from pathlib import Path
 
 from .processor import process_pdf
-from .providers import PROVIDERS, get_provider
+from .providers import PROVIDERS
 
 
 def cli():
@@ -77,20 +79,38 @@ def cli():
 
     args = parser.parse_args()
 
-    provider = get_provider(args.provider, server_url=args.server_url)
-    model = args.model or provider.default_model
+    try:
+        process_pdf(
+            pdf_path=args.pdf_path,
+            output_dir=args.output,
+            provider=args.provider,
+            model=args.model,
+            custom_instructions=_read_custom_instructions(args.custom_instructions),
+            keep_images=args.keep_images,
+            width=args.width,
+            start=args.start,
+            end=args.end,
+            server_url=args.server_url,
+        )
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
 
-    process_pdf(
-        pdf_path=args.pdf_path,
-        custom_instructions=args.custom_instructions,
-        output_dir=args.output,
-        model=model,
-        keep_images=args.keep_images,
-        width=args.width,
-        start=args.start,
-        end=args.end,
-        provider=provider,
-    )
+
+def _read_custom_instructions(path: str | None) -> str | None:
+    """Read a custom-instructions file. Returns None when no path was given."""
+    if not path:
+        return None
+
+    instructions_path = Path(path)
+    if not instructions_path.exists():
+        raise FileNotFoundError(
+            f"Custom instructions file not found: {instructions_path}"
+        )
+    try:
+        return instructions_path.read_text(encoding="utf-8").strip()
+    except OSError as e:
+        raise OSError(f"Error reading custom instructions file: {e}") from e
 
 
 if __name__ == "__main__":

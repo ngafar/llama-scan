@@ -72,3 +72,24 @@ Use a different Ollama model:
 ```bash
 llama-scan document.pdf --model qwen2.5vl:3b
 ```
+
+## Python
+
+Import `process_pdf` to run the same transcription from Python. It writes the page text and `text/merged.txt` under `output_dir`, and returns the path to the merged file. `provider` defaults to `ollama`. `custom_instructions` is the instruction text, not a file path.
+
+```python
+from llama_scan import process_pdf
+
+merged = process_pdf("document.pdf", "output")
+print(merged.read_text(encoding="utf-8"))
+```
+
+```python
+merged = process_pdf(
+    "document.pdf",
+    "output",
+    provider="openrouter",
+    start=1,
+    end=5,
+)
+```
