@@ -6,6 +6,18 @@ from .providers import TranscriptionProvider, get_provider
 from .utils import setup_output_dirs, merge_text_files, pdf_to_images, resize_image
 
 
+class PageTranscriptionError(Exception):
+    """One or more pages failed to transcribe."""
+
+    def __init__(self, failures: list[tuple[int, str]]):
+        self.failures = failures
+        detail = ", ".join(
+            f"page {number} ({message})" for number, message in failures
+        )
+        noun = "page" if len(failures) == 1 else "pages"
+        super().__init__(f"Failed to transcribe {len(failures)} {noun}: {detail}")
+
+
 def process_pdf(
     pdf_path: str | Path,
     output_dir: str | Path,
@@ -44,6 +56,8 @@ def process_pdf(
         FileNotFoundError: If the PDF does not exist.
         ValueError: If the provider name or page range is invalid.
         RuntimeError: If the provider is unavailable or no pages were transcribed.
+        PageTranscriptionError: If any page fails. Pages that succeeded stay in
+            `output_dir/text/`, and `merged.txt` is not written.
     """
     pdf_path = Path(pdf_path)
     output_base = Path(output_dir)
@@ -71,12 +85,14 @@ def process_pdf(
         ):
             resize_image(str(image_file), str(image_file), width)
 
-    for i, image_file in tqdm(
-        enumerate(image_files, 1),
+    failures: list[tuple[int, str]] = []
+    for image_file in tqdm(
+        image_files,
         desc="Transcribing pages",
         total=total_pages,
         disable=not show_progress,
     ):
+        page_number = int(image_file.stem.removeprefix("page_"))
         try:
             transcription = provider.transcribe_image(
                 str(image_file),
@@ -88,10 +104,15 @@ def process_pdf(
             with open(text_file, "w", encoding="utf-8") as f:
                 f.write(transcription)
         except Exception as e:
-            print(f"Error processing page {i}: {str(e)}", file=sys.stderr)
+            message = str(e)
+            failures.append((page_number, message))
+            print(f"Error processing page {page_number}: {message}", file=sys.stderr)
 
         if not keep_images:
             image_file.unlink()
+
+    if failures:
+        raise PageTranscriptionError(failures)
 
     merged_file = merge_text_files(text_dir)
     print(f"Processing complete! Output saved to: {output_base}", file=sys.stderr)
