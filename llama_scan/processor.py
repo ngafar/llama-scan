@@ -3,11 +3,12 @@ from pathlib import Path
 
 from tqdm import tqdm
 
+from .errors import LlamaScanError, ProviderError
 from .providers import TranscriptionProvider, get_provider
 from .utils import merge_text_files, pdf_to_images, resize_image, setup_output_dirs
 
 
-class PageTranscriptionError(Exception):
+class PageTranscriptionError(LlamaScanError):
     """One or more pages failed to transcribe."""
 
     def __init__(self, failures: list[tuple[int, str]]):
@@ -54,7 +55,8 @@ def process_pdf(
     Raises:
         FileNotFoundError: If the PDF does not exist.
         ValueError: If the provider name or page range is invalid.
-        RuntimeError: If the provider is unavailable or no pages were transcribed.
+        ProviderError: If the provider is unavailable.
+        RuntimeError: If no pages were transcribed.
         PageTranscriptionError: If any page fails. Pages that succeeded stay in
             `output_dir/text/`, and `merged.txt` is not written.
     """
@@ -102,7 +104,7 @@ def process_pdf(
             text_file = text_dir / f"{image_file.stem}.txt"
             with open(text_file, "w", encoding="utf-8") as f:
                 f.write(transcription)
-        except Exception as e:
+        except (ProviderError, OSError) as e:
             message = str(e)
             failures.append((page_number, message))
             print(f"Error processing page {page_number}: {message}", file=sys.stderr)

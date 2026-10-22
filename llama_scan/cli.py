@@ -3,6 +3,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+from .errors import LlamaScanError
 from .processor import process_pdf
 from .providers import PROVIDERS
 
@@ -91,7 +92,7 @@ def cli():
             end=args.end,
             server_url=args.server_url,
         )
-    except Exception as e:
+    except (LlamaScanError, OSError, ValueError, RuntimeError) as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 

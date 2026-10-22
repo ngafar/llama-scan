@@ -2,6 +2,7 @@ import base64
 
 import requests
 
+from ..errors import ProviderError
 from .base import TranscriptionProvider, build_prompt
 
 
@@ -18,10 +19,10 @@ class OllamaProvider(TranscriptionProvider):
         """Check if the Ollama server is running."""
         try:
             requests.get(f"{self.server_url}/api/tags", timeout=10)
-        except requests.exceptions.RequestException:
-            raise RuntimeError(
+        except requests.exceptions.RequestException as exc:
+            raise ProviderError(
                 "Ollama server not running. Please start the server and try again."
-            )
+            ) from exc
 
     def transcribe_image(
         self,
@@ -47,11 +48,27 @@ class OllamaProvider(TranscriptionProvider):
             "images": [image_data],
         }
 
-        response = requests.post(f"{self.server_url}/api/generate", json=payload)
+        try:
+            response = requests.post(f"{self.server_url}/api/generate", json=payload)
+        except requests.exceptions.RequestException as exc:
+            raise ProviderError(f"Ollama request failed: {exc}") from exc
+
+        try:
+            data = response.json()
+        except ValueError as exc:
+            raise ProviderError(
+                "Ollama returned a non-JSON response "
+                f"({response.status_code}): {response.text}"
+            ) from exc
 
         if response.status_code == 200:
-            return response.json()["response"]
+            try:
+                return data["response"]
+            except KeyError as exc:
+                raise ProviderError(
+                    f"Ollama returned an unexpected response: {data}"
+                ) from exc
 
-        raise Exception(
+        raise ProviderError(
             f"API call failed with status code {response.status_code}: {response.text}"
         )
