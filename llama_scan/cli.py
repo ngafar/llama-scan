@@ -4,8 +4,8 @@ from datetime import datetime
 from pathlib import Path
 
 from .errors import LlamaScanError
-from .processor import process_pdf
 from .providers import PROVIDERS
+from .transcribe import process_pdf
 
 
 def cli():

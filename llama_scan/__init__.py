@@ -1,7 +1,7 @@
 """Transcribe PDF pages with Ollama or OpenRouter."""
 
-from .processor import PageTranscriptionError, process_pdf
 from .providers import PROVIDERS, TranscriptionProvider, get_provider
+from .transcribe import PageTranscriptionError, process_pdf
 
 __all__ = [
     "PROVIDERS",
