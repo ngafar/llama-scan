@@ -24,7 +24,7 @@ def process_pdf(
     *,
     provider: str | TranscriptionProvider = "ollama",
     model: str | None = None,
-    custom_instructions: str | None = None,
+    prompt: str | None = None,
     keep_images: bool = False,
     width: int = 0,
     start: int = 0,
@@ -41,7 +41,7 @@ def process_pdf(
         provider: Provider name (`ollama` or `openrouter`) or a provider instance.
             Defaults to Ollama.
         model: Model to use. Defaults to the provider's model.
-        custom_instructions: Extra prompt text appended to the transcription instructions.
+        prompt: Transcription prompt. When set, replaces the default book prompt.
         keep_images: Whether to keep the page images after processing.
         width: Resize images to this width. `0` leaves them unchanged.
         start: First page to process (1-based). `0` starts at the first page.
@@ -97,7 +97,7 @@ def process_pdf(
             transcription = provider.transcribe_image(
                 str(image_file),
                 model=model,
-                custom_instructions=custom_instructions,
+                prompt=prompt,
             )
 
             text_file = text_dir / f"{image_file.stem}.txt"

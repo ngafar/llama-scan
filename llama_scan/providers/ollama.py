@@ -27,7 +27,7 @@ class OllamaProvider(TranscriptionProvider):
         self,
         image_path: str,
         model: str,
-        custom_instructions: str | None = None,
+        prompt: str | None = None,
     ) -> str:
         """
         Transcribe an image using the specified Ollama model.
@@ -35,14 +35,14 @@ class OllamaProvider(TranscriptionProvider):
         Args:
             image_path (str): Path to the image file.
             model (str): The model to use for transcription.
-            custom_instructions (str, optional): Additional instructions to include in the prompt.
+            prompt (str, optional): Prompt that replaces the default transcription prompt.
         """
         with open(image_path, "rb") as image_file:
             image_data = base64.b64encode(image_file.read()).decode("utf-8")
 
         payload = {
             "model": model,
-            "prompt": build_prompt(custom_instructions),
+            "prompt": build_prompt(prompt),
             "stream": False,
             "images": [image_data],
         }

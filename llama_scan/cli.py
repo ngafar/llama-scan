@@ -52,9 +52,8 @@ def cli():
         help="End page number (default: 0)",
     )
     parser.add_argument(
-        "--custom-instructions",
-        "-c",
-        help="Path to a text file containing additional instructions for the transcription prompt",
+        "--prompt",
+        help="Path to a text file that replaces the default transcription prompt",
     )
     parser.add_argument(
         "--server-url",
@@ -85,7 +84,7 @@ def cli():
             output_dir=args.output,
             provider=args.provider,
             model=args.model,
-            custom_instructions=_read_custom_instructions(args.custom_instructions),
+            prompt=_read_prompt(args.prompt),
             keep_images=args.keep_images,
             width=args.width,
             start=args.start,
@@ -97,20 +96,18 @@ def cli():
         sys.exit(1)
 
 
-def _read_custom_instructions(path: str | None) -> str | None:
-    """Read a custom-instructions file. Returns None when no path was given."""
+def _read_prompt(path: str | None) -> str | None:
+    """Read a prompt file. Returns None when no path was given."""
     if not path:
         return None
 
-    instructions_path = Path(path)
-    if not instructions_path.exists():
-        raise FileNotFoundError(
-            f"Custom instructions file not found: {instructions_path}"
-        )
+    prompt_path = Path(path)
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {prompt_path}")
     try:
-        return instructions_path.read_text(encoding="utf-8").strip()
+        return prompt_path.read_text(encoding="utf-8").strip()
     except OSError as e:
-        raise OSError(f"Error reading custom instructions file: {e}") from e
+        raise OSError(f"Error reading prompt file: {e}") from e
 
 
 if __name__ == "__main__":

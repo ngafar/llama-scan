@@ -54,7 +54,7 @@ class OpenRouterProvider(TranscriptionProvider):
         self,
         image_path: str,
         model: str,
-        custom_instructions: str | None = None,
+        prompt: str | None = None,
     ) -> str:
         """
         Transcribe an image using the OpenRouter chat completions API.
@@ -62,7 +62,7 @@ class OpenRouterProvider(TranscriptionProvider):
         Args:
             image_path (str): Path to the image file.
             model (str): OpenRouter model slug to use for transcription.
-            custom_instructions (str, optional): Additional instructions to include in the prompt.
+            prompt (str, optional): Prompt that replaces the default transcription prompt.
         """
         suffix = Path(image_path).suffix.lower()
         mime_type = _MIME_TYPES.get(suffix, "image/png")
@@ -76,7 +76,7 @@ class OpenRouterProvider(TranscriptionProvider):
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": build_prompt(custom_instructions)},
+                        {"type": "text", "text": build_prompt(prompt)},
                         {"type": "image_url", "image_url": {"url": data_url}},
                     ],
                 }
