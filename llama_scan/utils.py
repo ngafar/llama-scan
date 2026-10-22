@@ -10,6 +10,9 @@ def setup_output_dirs(output_base: Path) -> tuple[Path, Path]:
     """
     Create and return paths for image and text output directories.
 
+    Previous `page_*.txt` files and `merged.txt` in the text directory are removed
+    so a reused output directory does not include transcriptions from an earlier run.
+
     Args:
         output_base (Path): The base directory for output.
     """
@@ -18,8 +21,18 @@ def setup_output_dirs(output_base: Path) -> tuple[Path, Path]:
 
     image_dir.mkdir(parents=True, exist_ok=True)
     text_dir.mkdir(parents=True, exist_ok=True)
+    clear_text_outputs(text_dir)
 
     return image_dir, text_dir
+
+
+def clear_text_outputs(text_dir: Path) -> None:
+    """Remove transcription files left by a previous run in this directory."""
+    for path in text_dir.glob("page_*.txt"):
+        path.unlink()
+    merged_file = text_dir / "merged.txt"
+    if merged_file.exists():
+        merged_file.unlink()
 
 
 def pdf_to_images(
