@@ -70,6 +70,12 @@ def cli():
         help="Width of the resized images. Set to 0 to skip resizing (default: 0)",
     )
     parser.add_argument(
+        "--dpi",
+        type=int,
+        default=72,
+        help="Resolution used when rendering PDF pages (default: 72)",
+    )
+    parser.add_argument(
         "--keep-images",
         "-k",
         action="store_true",
@@ -88,6 +94,7 @@ def cli():
             prompt=_read_prompt(args.prompt),
             keep_images=args.keep_images,
             width=args.width,
+            dpi=args.dpi,
             start=args.start,
             end=args.end,
             server_url=args.server_url,

@@ -27,6 +27,7 @@ def process_pdf(
     prompt: str | None = None,
     keep_images: bool = False,
     width: int = 0,
+    dpi: int = 72,
     start: int = 0,
     end: int = 0,
     server_url: str | None = None,
@@ -44,6 +45,7 @@ def process_pdf(
         prompt: Transcription prompt. When set, replaces the default book prompt.
         keep_images: Whether to keep the page images after processing.
         width: Resize images to this width. `0` leaves them unchanged.
+        dpi: Resolution used when rendering PDF pages. Defaults to 72.
         start: First page to process (1-based). `0` starts at the first page.
         end: Last page to process (1-based). `0` stops at the last page.
         server_url: Ollama server URL, used when `provider` is a name.
@@ -54,7 +56,7 @@ def process_pdf(
 
     Raises:
         FileNotFoundError: If the PDF does not exist.
-        ValueError: If the provider name or page range is invalid.
+        ValueError: If the provider name, page range, or DPI is invalid.
         ProviderError: If the provider is unavailable.
         RuntimeError: If no pages were transcribed.
         PageTranscriptionError: If any page fails. Pages that succeeded stay in
@@ -75,7 +77,9 @@ def process_pdf(
 
     image_dir, text_dir = setup_output_dirs(output_base)
 
-    pdf_to_images(str(pdf_path), image_dir, start, end, show_progress=show_progress)
+    pdf_to_images(
+        str(pdf_path), image_dir, start, end, show_progress=show_progress, dpi=dpi
+    )
 
     image_files = sorted(image_dir.glob("page_*.png"))
     total_pages = len(image_files)

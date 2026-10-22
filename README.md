@@ -71,6 +71,7 @@ The following options can be used to customize PDF processing.
 | Option | Description | Default |
 |---|---|---|
 | `--width`, `-w` | Resize images to the specified width (`0` disables resizing) | `0` |
+| `--dpi` | Resolution used when rendering PDF pages | `72` |
 | `--keep-images`, `-k` | Keep intermediate image files | `False` |
 
 ### Examples
