@@ -1,6 +1,7 @@
 import io
-import pymupdf
 from pathlib import Path
+
+import pymupdf
 from PIL import Image
 from tqdm import tqdm
 
@@ -84,7 +85,7 @@ def resize_image(image_path: str, output_path: str, width: int) -> None:
     else:
         img = Image.open(image_path)
         w_percent = width / float(img.size[0])
-        h_size = int((float(img.size[1]) * float(w_percent)))
+        h_size = int(float(img.size[1]) * float(w_percent))
         img = img.resize((width, h_size), Image.Resampling.LANCZOS)
         img.save(output_path)
 

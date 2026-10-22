@@ -1,9 +1,10 @@
 import sys
 from pathlib import Path
+
 from tqdm import tqdm
 
 from .providers import TranscriptionProvider, get_provider
-from .utils import setup_output_dirs, merge_text_files, pdf_to_images, resize_image
+from .utils import merge_text_files, pdf_to_images, resize_image, setup_output_dirs
 
 
 class PageTranscriptionError(Exception):
