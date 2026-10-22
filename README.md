@@ -45,6 +45,18 @@ Basic usage:
 llama-scan path/to/your/file.pdf
 ```
 
+Process specific pages:
+
+```bash
+llama-scan document.pdf --start 1 --end 5
+```
+
+Use a different model (Ollama):
+
+```bash
+llama-scan document.pdf --model qwen2.5vl:3b
+```
+
 ### Options
 
 The following options can be used to customize PDF processing.
@@ -73,20 +85,6 @@ The following options can be used to customize PDF processing.
 | `--width`, `-w` | Resize images to the specified width (`0` disables resizing) | `0` |
 | `--dpi` | Resolution used when rendering PDF pages | `72` |
 | `--keep-images`, `-k` | Keep intermediate image files | `False` |
-
-### Examples
-
-Process specific pages:
-
-```bash
-llama-scan document.pdf --start 1 --end 5
-```
-
-Use a different Ollama model:
-
-```bash
-llama-scan document.pdf --model qwen2.5vl:3b
-```
 
 ## Python API
 
