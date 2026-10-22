@@ -5,7 +5,14 @@ from tqdm import tqdm
 
 from .errors import LlamaScanError, ProviderError
 from .providers import TranscriptionProvider, get_provider
-from .utils import merge_text_files, pdf_to_images, resize_image, setup_output_dirs
+from .utils import (
+    clear_previous_outputs,
+    merge_text_files,
+    pdf_to_images,
+    prepare_pdf,
+    resize_image,
+    setup_output_dirs,
+)
 
 
 class PageTranscriptionError(LlamaScanError):
@@ -75,11 +82,20 @@ def process_pdf(
     provider.check()
     print(f"Using {provider.name} ({model})", file=sys.stderr)
 
+    doc, start_page, end_page = prepare_pdf(str(pdf_path), start, end, dpi)
     image_dir, text_dir = setup_output_dirs(output_base)
-
-    image_files = pdf_to_images(
-        str(pdf_path), image_dir, start, end, show_progress=show_progress, dpi=dpi
-    )
+    try:
+        clear_previous_outputs(image_dir, text_dir)
+        image_files = pdf_to_images(
+            doc,
+            image_dir,
+            start_page,
+            end_page,
+            show_progress=show_progress,
+            dpi=dpi,
+        )
+    finally:
+        doc.close()
     total_pages = len(image_files)
 
     if width > 0:

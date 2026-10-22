@@ -10,9 +10,6 @@ def setup_output_dirs(output_base: Path) -> tuple[Path, Path]:
     """
     Create and return paths for image and text output directories.
 
-    Previous page images, `page_*.txt` files, and `merged.txt` in this directory are
-    removed so a reused output directory does not include files from an earlier run.
-
     Args:
         output_base (Path): The base directory for output.
     """
@@ -21,7 +18,6 @@ def setup_output_dirs(output_base: Path) -> tuple[Path, Path]:
 
     image_dir.mkdir(parents=True, exist_ok=True)
     text_dir.mkdir(parents=True, exist_ok=True)
-    clear_previous_outputs(image_dir, text_dir)
 
     return image_dir, text_dir
 
@@ -37,49 +33,61 @@ def clear_previous_outputs(image_dir: Path, text_dir: Path) -> None:
         merged_file.unlink()
 
 
+def prepare_pdf(
+    pdf_path: str, start: int, end: int, dpi: int
+) -> tuple[pymupdf.Document, int, int]:
+    """
+    Open a PDF and validate the render settings.
+
+    Returns the open document and the normalized start and end pages. The caller
+    closes the document.
+    """
+    if dpi <= 0:
+        raise ValueError(f"DPI must be positive, got {dpi}.")
+
+    doc = pymupdf.open(pdf_path)
+    try:
+        total_pages = len(doc)
+        if start < 0 or (start > total_pages and start != 0):
+            raise ValueError(
+                f"Start page number {start} is out of range. Document has {total_pages} pages."
+            )
+        if end < 0 or (end > total_pages and end != 0):
+            raise ValueError(
+                f"End page number {end} is out of range. Document has {total_pages} pages."
+            )
+    except ValueError:
+        doc.close()
+        raise
+
+    start = 1 if start == 0 else start
+    end = total_pages if end == 0 else end
+    return doc, start, end
+
+
 def pdf_to_images(
-    pdf_path: str,
+    doc: pymupdf.Document,
     output_dir: Path,
-    start: int = 0,
-    end: int = 0,
+    start: int,
+    end: int,
     show_progress: bool = True,
     dpi: int = 72,
 ) -> list[Path]:
     """
-    Convert PDF pages to images and save them to the specified output directory.
+    Render PDF pages to images.
 
     Args:
-        pdf_path (str): Path to the input PDF file
-        output_dir (Path): Directory where the images will be saved
-        start (int): The start page number (1-based). If 0, starts from first page.
-        end (int): The end page number (1-based). If 0, goes until last page.
+        doc (pymupdf.Document): Open PDF document.
+        output_dir (Path): Directory where the images will be saved.
+        start (int): First page to render (1-based).
+        end (int): Last page to render (1-based).
         show_progress (bool): Whether to display a progress bar.
         dpi (int): Resolution used when rendering each page.
 
     Returns:
         Paths of the page images written for this run, in page order.
     """
-    if dpi <= 0:
-        raise ValueError(f"DPI must be positive, got {dpi}.")
-
-    doc = pymupdf.open(pdf_path)
     total_pages = len(doc)
-
-    # Validate page numbers
-    if start < 0 or (start > total_pages and start != 0):
-        raise ValueError(
-            f"Start page number {start} is out of range. Document has {total_pages} pages."
-        )
-    if end < 0 or (end > total_pages and end != 0):
-        raise ValueError(
-            f"End page number {end} is out of range. Document has {total_pages} pages."
-        )
-
-    # Set default values for start and end
-    start = 1 if start == 0 else start
-    end = total_pages if end == 0 else end
-
-    # Convert specified pages
     written_images: list[Path] = []
     for page_num in tqdm(
         range(start, end + 1),
