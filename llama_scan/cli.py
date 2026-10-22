@@ -2,11 +2,12 @@ import argparse
 from datetime import datetime
 
 from .processor import process_pdf
+from .providers import PROVIDERS, get_provider
 
 
 def cli():
     parser = argparse.ArgumentParser(
-        description="Convert PDF pages to images and transcribe them using Ollama."
+        description="Convert PDF pages to images and transcribe them."
     )
     parser.add_argument(
         "pdf_path",
@@ -19,10 +20,20 @@ def cli():
         help="Output directory (default: output_YYYYMMDD_HHMMSS)",
     )
     parser.add_argument(
+        "--provider",
+        "-p",
+        default="ollama",
+        choices=list(PROVIDERS),
+        help="Transcription provider (default: ollama)",
+    )
+    parser.add_argument(
         "--model",
         "-m",
-        default="qwen2.5vl:latest",
-        help="Ollama model to use (default: qwen2.5vl:latest)",
+        default=None,
+        help=(
+            "Model to use. Defaults to qwen2.5vl:latest for Ollama and "
+            "qwen/qwen2.5-vl-72b-instruct for OpenRouter."
+        ),
     )
     parser.add_argument(
         "--start",
@@ -72,17 +83,20 @@ def cli():
 
     args = parser.parse_args()
 
+    provider = get_provider(args.provider, server_url=args.server_url)
+    model = args.model or provider.default_model
+
     process_pdf(
         pdf_path=args.pdf_path,
         custom_instructions=args.custom_instructions,
         output_dir=args.output,
-        model=args.model,
+        model=model,
         keep_images=args.keep_images,
         width=args.width,
         start=args.start,
         end=args.end,
         stdout=args.stdout,
-        server_url=args.server_url,
+        provider=provider,
     )
 
 

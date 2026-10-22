@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 from tqdm import tqdm
 
-from .ollama import transcribe_image, check_for_server
+from .providers import TranscriptionProvider
 from .utils import setup_output_dirs, merge_text_files, pdf_to_images, resize_image
 
 
@@ -16,7 +16,7 @@ def process_pdf(
     start: int,
     end: int,
     stdout: bool,
-    server_url: str,
+    provider: TranscriptionProvider,
 ) -> None:
     """
     Process a PDF file, converting pages to images and transcribing them.
@@ -31,7 +31,7 @@ def process_pdf(
         start (int): The start page number.
         end (int): The end page number.
         stdout (bool): Whether to write output to stdout.
-        server_url (str): The URL of the Ollama server.
+        provider (TranscriptionProvider): The transcription backend to use.
     """
     pdf_path = Path(pdf_path)
     output_base = Path(output_dir)
@@ -40,11 +40,13 @@ def process_pdf(
         print(f"Error: PDF file not found: {pdf_path}")
         sys.exit(1)
 
-    if not check_for_server(server_url):
-        print(
-            "Error: Ollama server not running. Please start the server and try again."
-        )
+    try:
+        provider.check()
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
+
+    print(f"Using {provider.name} ({model})", file=sys.stderr)
 
     # Read custom instructions file if provided
     custom_instructions_content = None
@@ -87,11 +89,10 @@ def process_pdf(
         ):
             # Transcribe the image
             try:
-                transcription = transcribe_image(
+                transcription = provider.transcribe_image(
                     str(image_file),
                     model=model,
                     custom_instructions=custom_instructions_content,
-                    server_url=server_url,
                 )
 
                 # Save transcription
