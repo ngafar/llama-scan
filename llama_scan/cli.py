@@ -34,8 +34,9 @@ def cli():
         "-m",
         default=None,
         help=(
-            "Model to use. Defaults to qwen2.5vl:latest for Ollama and "
-            "qwen/qwen2.5-vl-72b-instruct for OpenRouter."
+            "Model to use. Defaults to qwen2.5vl:latest for Ollama, "
+            "qwen/qwen2.5-vl-72b-instruct for OpenRouter and openai/gpt-4o-mini "
+            "for LiteLLM."
         ),
     )
     parser.add_argument(

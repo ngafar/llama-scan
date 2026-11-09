@@ -1,22 +1,12 @@
-import base64
 import os
-from pathlib import Path
 
 import requests
 
 from ..errors import ProviderError
-from .base import TranscriptionProvider, build_prompt
+from .base import TranscriptionProvider, build_prompt, chat_message_text, image_data_url
 
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 KEY_URL = "https://openrouter.ai/api/v1/key"
-
-_MIME_TYPES = {
-    ".png": "image/png",
-    ".jpg": "image/jpeg",
-    ".jpeg": "image/jpeg",
-    ".webp": "image/webp",
-    ".gif": "image/gif",
-}
 
 
 class OpenRouterProvider(TranscriptionProvider):
@@ -65,11 +55,7 @@ class OpenRouterProvider(TranscriptionProvider):
             model (str): OpenRouter model slug to use for transcription.
             prompt (str, optional): Prompt that replaces the default transcription prompt.
         """
-        suffix = Path(image_path).suffix.lower()
-        mime_type = _MIME_TYPES.get(suffix, "image/png")
-        with open(image_path, "rb") as image_file:
-            image_data = base64.b64encode(image_file.read()).decode("utf-8")
-        data_url = f"data:{mime_type};base64,{image_data}"
+        data_url = image_data_url(image_path)
 
         payload = {
             "model": model,
@@ -122,13 +108,7 @@ class OpenRouterProvider(TranscriptionProvider):
         if not choices:
             raise ProviderError(f"OpenRouter returned no choices: {data}")
 
-        content = (choices[0].get("message") or {}).get("content")
-        if isinstance(content, list):
-            content = "".join(
-                part.get("text", "")
-                for part in content
-                if isinstance(part, dict) and part.get("type", "text") == "text"
-            )
+        content = chat_message_text((choices[0].get("message") or {}).get("content"))
         if not content:
             raise ProviderError(f"OpenRouter returned an empty response: {data}")
         return content
