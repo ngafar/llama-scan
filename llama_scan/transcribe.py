@@ -41,7 +41,8 @@ def process_pdf(
     Args:
         pdf_path: Path to the PDF file.
         output_dir: Directory where images and text are written.
-        provider: Provider name (`ollama` or `openrouter`) or a provider instance.
+        provider: Provider name (`ollama`, `openrouter` or `litellm`) or a provider
+            instance.
             Defaults to Ollama.
         model: Model to use. Defaults to the provider's model.
         prompt: Transcription prompt. When set, replaces the default book prompt.

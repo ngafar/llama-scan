@@ -1,10 +1,12 @@
 from .base import TranscriptionProvider
+from .litellm import LiteLLMProvider
 from .ollama import OllamaProvider
 from .openrouter import OpenRouterProvider
 
 PROVIDERS: dict[str, type[TranscriptionProvider]] = {
     "ollama": OllamaProvider,
     "openrouter": OpenRouterProvider,
+    "litellm": LiteLLMProvider,
 }
 
 

@@ -11,6 +11,9 @@ dependencies = [
     "tqdm>=4.67.1",
 ]
 
+[project.optional-dependencies]
+litellm = ["litellm>=1.97.0,<1.106.0"]
+
 [project.scripts]
 llama-scan = "llama_scan.cli:cli"
 
